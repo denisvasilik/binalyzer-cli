@@ -6,11 +6,25 @@ import hexdump
 from binalyzer import (
     Binalyzer,
     Template,
+    TemplateProvider,
     ResolvableValue,
     XMLTemplateParser,
-    utils,
     __version__,
+    BufferedIODataProvider,
 )
+
+
+class DefaultTemplateProvider(TemplateProvider):
+    def __init__(self, template):
+        self._template = template
+
+    @property
+    def template(self):
+        return self._template
+
+    @template.setter
+    def template(self, value):
+        self._template = value
 
 
 class BasedIntParamType(click.ParamType):
@@ -159,9 +173,10 @@ def dump(file, start_offset, end_offset, output):
 def template(file, template_file, template_path, output):
     """Dump file content using a template.
     """
-    _binalyzer = Binalyzer()
-    _binalyzer.template = template_path.root
-    _binalyzer.stream = file
+    template_provider = DefaultTemplateProvider(template_path.root)
+    data_provider = BufferedIODataProvider(file)
+    binalyzer = Binalyzer(template_provider, data_provider)
+    binalyzer.template = template_path.root
 
     if output:
         output.write(template_path.value)
@@ -251,3 +266,67 @@ def json(file, template_file):
         binalyzer.template = template.root
 
     print(visitTemplate(binalyzer.template, to_json))
+
+
+def customized_hexdump(data, offset, result="print"):
+    """
+  Transform binary data to the hex dump text format:
+  00000000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+    [x] data argument as a binary string
+    [x] data argument as a file like object
+  Returns result depending on the `result` argument:
+    'print'     - prints line by line
+    'return'    - returns single string
+    'generator' - returns generator that produces lines
+  """
+    if hexdump.PY3K and type(data) == str:
+        raise TypeError("Abstract unicode data (expected bytes sequence)")
+
+    gen = hexdump.dumpgen(data, offset)
+    if result == "generator":
+        return gen
+    elif result == "return":
+        return "\n".join(gen)
+    elif result == "print":
+        for line in gen:
+            print(line)
+    else:
+        raise ValueError("Unknown value of `result` argument")
+
+
+def customized_dumpgen(data, offset):
+    """
+  Generator that produces strings:
+  '00000000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................'
+  """
+    generator = hexdump.genchunks(data, 16)
+    for addr, d in enumerate(generator):
+        # 00000000:
+        line = "%08X: " % ((addr * 16) + offset)
+        # 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+        dumpstr = hexdump.dump(d)
+        line += dumpstr[: 8 * 3]
+        if len(d) > 8:  # insert separator if needed
+            line += " " + dumpstr[8 * 3 :]
+        # ................
+        # calculate indentation, which may be different for the last line
+        pad = 2
+        if len(d) < 16:
+            pad += 3 * (16 - len(d))
+        if len(d) <= 8:
+            pad += 1
+        line += " " * pad
+
+        for byte in d:
+            # printable ASCII range 0x20 to 0x7E
+            if not hexdump.PY3K:
+                byte = ord(byte)
+            if 0x20 <= byte <= 0x7E:
+                line += chr(byte)
+            else:
+                line += "."
+        yield line
+
+
+hexdump.__dict__["hexdump"] = customized_hexdump
+hexdump.__dict__["dumpgen"] = customized_dumpgen
