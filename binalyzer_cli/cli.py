@@ -124,11 +124,11 @@ class ExpandedFile(click.File):
 @click.group()
 @click.version_option(__version__)
 @click.pass_context
-def cli(ctx):
+def binalyzer(ctx):
     pass
 
 
-@cli.command()
+@binalyzer.command()
 @click.argument("file", type=ExpandedFile("rb"))
 @click.option("--start-offset", default="0", type=BASED_INT)
 @click.option("--end-offset", default="0", type=BASED_INT)
@@ -151,9 +151,10 @@ def dump(file, start_offset, end_offset, output):
     template = Template()
     template.offset = ResolvableValue(start_offset)
     template.size = ResolvableValue(size)
-    _binalyzer = Binalyzer()
-    _binalyzer.template = template
-    _binalyzer.stream = file
+    template_provider = DefaultTemplateProvider(template)
+    data_provider = BufferedIODataProvider(file)
+    binalyzer = Binalyzer(template_provider, data_provider)
+    binalyzer.template = template
 
     if output:
         output.write(template.value)
@@ -161,7 +162,7 @@ def dump(file, start_offset, end_offset, output):
         hexdump.hexdump(template.value, template.offset.value)
 
 
-@cli.command()
+@binalyzer.command()
 @click.argument("file", type=ExpandedFile("rb"))
 @click.argument("template_file", type=ExpandedFile("r"))
 @click.argument(
@@ -187,9 +188,9 @@ def template(file, template_file, template_path, output):
 
 
 def dump_all(template):
-    stream = template.binding_context.stream
-    stream.seek(0)
-    data = stream.read()
+    data = template.binding_context.data
+    data.seek(0)
+    data = data.read()
     content = ""
     for x in ["{0:02X}".format(x) for x in data]:
         content += f'"{x}", '
@@ -253,13 +254,15 @@ def to_json(template):
     )
 
 
-@cli.command()
+@binalyzer.command()
 @click.argument("file", type=ExpandedFile("rb"))
 @click.argument("template_file", type=ExpandedFile("r"), required=False)
 def json(file, template_file):
-    binalyzer = Binalyzer()
-    binalyzer.stream = file
-    binalyzer.template = Template(id="root")
+    template = Template(id="root")
+    template_provider = DefaultTemplateProvider(template)
+    data_provider = BufferedIODataProvider(file)
+    binalyzer = Binalyzer(template_provider, data_provider)
+    binalyzer.template = template
 
     if template_file:
         template = XMLTemplateParser(template_file.read()).parse()

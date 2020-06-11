@@ -16,4 +16,4 @@ __build__ = 0
 __version__ = "{}".format(__tag__)
 __commit__ = "00000000"
 
-from .cli import cli, TemplateAutoCompletion
+from .cli import binalyzer, TemplateAutoCompletion
