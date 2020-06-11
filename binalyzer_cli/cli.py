@@ -6,25 +6,12 @@ import hexdump
 from binalyzer import (
     Binalyzer,
     Template,
-    TemplateProvider,
+    SimpleTemplateProvider,
     ResolvableValue,
     XMLTemplateParser,
     __version__,
     BufferedIODataProvider,
 )
-
-
-class DefaultTemplateProvider(TemplateProvider):
-    def __init__(self, template):
-        self._template = template
-
-    @property
-    def template(self):
-        return self._template
-
-    @template.setter
-    def template(self, value):
-        self._template = value
 
 
 class BasedIntParamType(click.ParamType):
@@ -151,7 +138,7 @@ def dump(file, start_offset, end_offset, output):
     template = Template()
     template.offset = ResolvableValue(start_offset)
     template.size = ResolvableValue(size)
-    template_provider = DefaultTemplateProvider(template)
+    template_provider = SimpleTemplateProvider(template)
     data_provider = BufferedIODataProvider(file)
     binalyzer = Binalyzer(template_provider, data_provider)
     binalyzer.template = template
@@ -174,7 +161,7 @@ def dump(file, start_offset, end_offset, output):
 def template(file, template_file, template_path, output):
     """Dump file content using a template.
     """
-    template_provider = DefaultTemplateProvider(template_path.root)
+    template_provider = SimpleTemplateProvider(template_path.root)
     data_provider = BufferedIODataProvider(file)
     binalyzer = Binalyzer(template_provider, data_provider)
     binalyzer.template = template_path.root
@@ -259,7 +246,7 @@ def to_json(template):
 @click.argument("template_file", type=ExpandedFile("r"), required=False)
 def json(file, template_file):
     template = Template(id="root")
-    template_provider = DefaultTemplateProvider(template)
+    template_provider = SimpleTemplateProvider(template)
     data_provider = BufferedIODataProvider(file)
     binalyzer = Binalyzer(template_provider, data_provider)
     binalyzer.template = template

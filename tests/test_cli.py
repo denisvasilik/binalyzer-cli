@@ -3,7 +3,7 @@ import os
 
 from click.testing import CliRunner
 
-from binalyzer import Template, cli, TemplateAutoCompletion
+from binalyzer import Template, binalyzer, TemplateAutoCompletion
 
 
 TESTS_ABS_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -12,7 +12,7 @@ TESTS_ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 def test_stdout():
     runner = CliRunner()
     result = runner.invoke(
-        cli,
+        binalyzer,
         [
             "template",
             os.path.join(TESTS_ABS_PATH, "resources/test.bin"),
@@ -32,7 +32,7 @@ def test_write_template_to_file():
 
     runner = CliRunner()
     result = runner.invoke(
-        cli,
+        binalyzer,
         [
             "template",
             os.path.join(TESTS_ABS_PATH, "resources/test.bin"),
@@ -48,11 +48,11 @@ def test_write_template_to_file():
 
 def test_missing_binary_file():
     runner = CliRunner()
-    result = runner.invoke(cli, [])
+    result = runner.invoke(binalyzer, [])
     print(result.output)
     assert (
         result.output
-        == "Usage: cli [OPTIONS] COMMAND [ARGS]...\n\nOptions:\n  --version  Show the version and exit.\n  --help     Show this message and exit.\n\nCommands:\n  dump      Dump file content using optional start and end positions.\n  json\n  template  Dump file content using a template.\n"
+        == "Usage: binalyzer [OPTIONS] COMMAND [ARGS]...\n\nOptions:\n  --version  Show the version and exit.\n  --help     Show this message and exit.\n\nCommands:\n  dump      Dump file content using optional start and end positions.\n  json\n  template  Dump file content using a template.\n"
     )
     assert result.exit_code == 0
 
@@ -60,11 +60,11 @@ def test_missing_binary_file():
 def test_missing_template_file():
     runner = CliRunner()
     result = runner.invoke(
-        cli, ["template", os.path.join(TESTS_ABS_PATH, "resources/test.bin")]
+        binalyzer, ["template", os.path.join(TESTS_ABS_PATH, "resources/test.bin")]
     )
     assert (
         result.output
-        == "Usage: cli template [OPTIONS] FILE TEMPLATE_FILE TEMPLATE_PATH\nTry 'cli template --help' for help.\n\nError: Missing argument 'TEMPLATE_FILE'.\n"
+        == "Usage: binalyzer template [OPTIONS] FILE TEMPLATE_FILE TEMPLATE_PATH\nTry 'binalyzer template --help' for help.\n\nError: Missing argument 'TEMPLATE_FILE'.\n"
     )
     assert result.exit_code == 2
 
@@ -72,7 +72,7 @@ def test_missing_template_file():
 def test_missing_template():
     runner = CliRunner()
     result = runner.invoke(
-        cli,
+        binalyzer,
         [
             "template",
             os.path.join(TESTS_ABS_PATH, "resources/test.bin"),
@@ -81,7 +81,7 @@ def test_missing_template():
     )
     assert (
         result.output
-        == "Usage: cli template [OPTIONS] FILE TEMPLATE_FILE TEMPLATE_PATH\nTry 'cli template --help' for help.\n\nError: Missing argument 'TEMPLATE_PATH'.\n"
+        == "Usage: binalyzer template [OPTIONS] FILE TEMPLATE_FILE TEMPLATE_PATH\nTry 'binalyzer template --help' for help.\n\nError: Missing argument 'TEMPLATE_PATH'.\n"
     )
     assert result.exit_code == 2
 
@@ -89,7 +89,7 @@ def test_missing_template():
 def test_invalid_template():
     runner = CliRunner()
     result = runner.invoke(
-        cli,
+        binalyzer,
         [
             "template",
             os.path.join(TESTS_ABS_PATH, "resources/test.bin"),
@@ -100,7 +100,7 @@ def test_invalid_template():
     print(result.output)
     assert (
         result.output
-        == "Usage: cli template [OPTIONS] FILE TEMPLATE_FILE TEMPLATE_PATH\nTry 'cli template --help' for help.\n\nError: Missing argument 'TEMPLATE_PATH'.\n"
+        == "Usage: binalyzer template [OPTIONS] FILE TEMPLATE_FILE TEMPLATE_PATH\nTry 'binalyzer template --help' for help.\n\nError: Missing argument 'TEMPLATE_PATH'.\n"
     )
     assert result.exit_code == 2
 
