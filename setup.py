@@ -32,6 +32,7 @@ setuptools.setup(
     data_files=[("", ["CHANGELOG.md"])],
     setup_requires=[],
     install_requires=[
+        "binalyzer",
         "hexdump",
         "click",
     ],
