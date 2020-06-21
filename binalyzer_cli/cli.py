@@ -45,7 +45,7 @@ class BasedIntParamType(click.ParamType):
 
 class TemplateAutoCompletion(object):
     def autocompletion(self, ctx, args, incomplete):
-        with open(os.path.expanduser(args[1]), "r") as template_file:
+        with open(os.path.expanduser(args[2]), "r") as template_file:
             template = XMLTemplateParser(template_file.read()).parse()
             return self._autocomplete(template, incomplete)
 

@@ -67,7 +67,7 @@ def dump(file, start_offset, end_offset, output):
 def template(file, template_file, template_path, output):
     """Dump file content using a template.
     """
-    template_provider = DefaultSimpleTemplateProvider(template_path.root)
+    template_provider = SimpleTemplateProvider(template_path.root)
     data_provider = BufferedIODataProvider(file)
     binalyzer = Binalyzer(template_provider, data_provider)
     binalyzer.template = template_path.root
