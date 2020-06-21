@@ -152,7 +152,7 @@ def to_json(template):
 @click.argument("template_file", type=ExpandedFile("r"), required=False)
 def json(file, template_file):
     template = Template(id="root")
-    template_provider = DefaultSimpleTemplateProvider(template)
+    template_provider = SimpleTemplateProvider(template)
     data_provider = BufferedIODataProvider(file)
     binalyzer = Binalyzer(template_provider, data_provider)
     binalyzer.template = template
