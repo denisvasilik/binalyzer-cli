@@ -44,7 +44,7 @@ def dump(file, start_offset, end_offset, output):
     template = Template()
     template.offset = ResolvableValue(start_offset)
     template.size = ResolvableValue(size)
-    template_provider = SimpleSimpleTemplateProvider(template)
+    template_provider = SimpleTemplateProvider(template)
     data_provider = BufferedIODataProvider(file)
     binalyzer = Binalyzer(template_provider, data_provider)
     binalyzer.template = template
