@@ -128,7 +128,7 @@ def to_json(template):
 
     return (
         '"id": "'
-        + template.id
+        + template.name
         + '", "offset": '
         + str(template.offset.value)
         + ', "size": '
