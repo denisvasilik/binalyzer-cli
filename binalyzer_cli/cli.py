@@ -3,10 +3,14 @@ import click
 
 import hexdump
 
+from anytree import Resolver
+from anytree.resolver import ResolverError
+from anytree.search import findall
+
 from binalyzer import (
     Binalyzer,
     Template,
-    SimpleTemplateProvider,
+    TemplateProvider,
     ResolvableValue,
     XMLTemplateParser,
     __version__,
@@ -54,18 +58,19 @@ class TemplateAutoCompletion(object):
         prefix = ".".join(i for i in template_path[:-1])
         if prefix:
             prefix += "."
-        if template.id == template_path[0]:
-            templates = self._find_templates_by_incomplete(template, template_path[1:])
-            return [prefix + s.id for s in templates]
+        if template.name == template_path[0]:
+            templates = self._find_templates_by_incomplete(
+                template, template_path[1:])
+            return [prefix + s.name for s in templates]
         else:
-            return [template.id]
+            return [template.name]
 
     def _find_templates_by_incomplete(self, template, template_path):
         if len(template_path) == 1:
             return self._get_suggestion(template, template_path[0])
         else:
             for template_child in template.children:
-                if template_path[0] == template_child.id:
+                if template_path[0] == template_child.name:
                     return self._find_templates_by_incomplete(
                         template_child, template_path[1:]
                     )
@@ -73,11 +78,9 @@ class TemplateAutoCompletion(object):
                 return []
 
     def _get_suggestion(self, template, incomplete):
-        return [
-            template_child
-            for template_child in template.children
-            if incomplete in template_child.id
-        ]
+        retval = findall(
+            template, lambda template_child: incomplete in template_child.name)
+        return retval
 
 
 class TemplateParamType(click.ParamType):
@@ -85,18 +88,10 @@ class TemplateParamType(click.ParamType):
 
     def convert(self, value, param, ctx):
         template_file = ctx.params["template_file"]
-        template = XMLTemplateParser(template_file.read()).parse()
-        template_path = str.split(value, ".")
-        return self._find_template(template, template_path[1:])
-
-    def _find_template(self, template, template_path):
-        if len(template_path) == 0:
-            return template
-        else:
-            for child in template.children:
-                if template_path[0] == child.id:
-                    return self._find_template(child, template_path[1:])
-        return None
+        template_string = template_file.read()
+        template = XMLTemplateParser(template_string).parse()
+        template_path = "/" + value.replace(".", "/")
+        return Resolver('name').get(template, template_path)
 
 
 class ExpandedFile(click.File):

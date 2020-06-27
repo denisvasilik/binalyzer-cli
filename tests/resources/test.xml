@@ -1,9 +1,9 @@
-<template id="binary-data-64">
-    <field id="data-field-1" size="32">
-        <field id="depth-field-123" size="32"></field>
-        <field id="depth-field-124" size="32"></field>
+<template name="binary-data-64">
+    <field name="data-field-1" size="32">
+        <field name="depth-field-123" size="32"></field>
+        <field name="depth-field-124" size="32"></field>
     </field>
-    <field id="data-field-2" size="16"></field>
-    <field id="data-field-3" size="8"></field>
-    <field id="data-field-4" size="8"></field>
+    <field name="data-field-2" size="16"></field>
+    <field name="data-field-3" size="8"></field>
+    <field name="data-field-4" size="8"></field>
 </template>

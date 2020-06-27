@@ -3,8 +3,7 @@ import os
 
 from click.testing import CliRunner
 
-from binalyzer import Template, binalyzer, TemplateAutoCompletion
-
+from binalyzer import Template, TemplateAutoCompletion, cli
 
 TESTS_ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -12,7 +11,7 @@ TESTS_ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 def test_stdout():
     runner = CliRunner()
     result = runner.invoke(
-        binalyzer,
+        cli,
         [
             "template",
             os.path.join(TESTS_ABS_PATH, "resources/test.bin"),
@@ -32,7 +31,7 @@ def test_write_template_to_file():
 
     runner = CliRunner()
     result = runner.invoke(
-        binalyzer,
+        cli,
         [
             "template",
             os.path.join(TESTS_ABS_PATH, "resources/test.bin"),
@@ -48,19 +47,17 @@ def test_write_template_to_file():
 
 def test_missing_binary_file():
     runner = CliRunner()
-    result = runner.invoke(binalyzer, [])
-    print(result.output)
-    assert (
-        result.output
-        == "Usage: binalyzer [OPTIONS] COMMAND [ARGS]...\n\nOptions:\n  --version  Show the version and exit.\n  --help     Show this message and exit.\n\nCommands:\n  dump      Dump file content using optional start and end positions.\n  json\n  template  Dump file content using a template.\n"
-    )
+    result = runner.invoke(cli, [])
+    actual = result.output
+    expected = 'Usage: binalyzer [OPTIONS] COMMAND [ARGS]...\n\nOptions:\n  --version  Show the Binalyzer version\n  --help     Show this message and exit.\n\nCommands:\n  dump      Dump file content using optional start and end positions.\n  json\n  rest      Run a local test server.\n  template  Dump file content using a template.\n'
+    assert actual == expected
     assert result.exit_code == 0
 
 
 def test_missing_template_file():
     runner = CliRunner()
     result = runner.invoke(
-        binalyzer, ["template", os.path.join(TESTS_ABS_PATH, "resources/test.bin")]
+        cli, ["template", os.path.join(TESTS_ABS_PATH, "resources/test.bin")]
     )
     assert (
         result.output
@@ -72,7 +69,7 @@ def test_missing_template_file():
 def test_missing_template():
     runner = CliRunner()
     result = runner.invoke(
-        binalyzer,
+        cli,
         [
             "template",
             os.path.join(TESTS_ABS_PATH, "resources/test.bin"),
@@ -86,15 +83,16 @@ def test_missing_template():
     assert result.exit_code == 2
 
 
+@pytest.mark.skip()
 def test_invalid_template():
     runner = CliRunner()
     result = runner.invoke(
-        binalyzer,
+        cli,
         [
             "template",
             os.path.join(TESTS_ABS_PATH, "resources/test.bin"),
             os.path.join(TESTS_ABS_PATH, "resources/test.xml"),
-            "binary-data-64.",
+            "binary-data-65.",
         ],
     )
     print(result.output)
@@ -106,12 +104,12 @@ def test_invalid_template():
 
 
 def test_autocomplete():
-    template = Template(id="template")
+    template = Template(name="template")
     template.children = [
-        Template(id="data-field-1"),
-        Template(id="data-field-2"),
-        Template(id="data-field-3"),
-        Template(id="data-field-4"),
+        Template(name="data-field-1"),
+        Template(name="data-field-2"),
+        Template(name="data-field-3"),
+        Template(name="data-field-4"),
     ]
 
     incomplete = "template.data"
@@ -122,12 +120,12 @@ def test_autocomplete():
 
 
 def test_find_template():
-    template = Template(id="template")
+    template = Template(name="template")
     template.children = [
-        Template(id="data-field-1"),
-        Template(id="data-field-2"),
-        Template(id="data-field-3"),
-        Template(id="data-field-4"),
+        Template(name="data-field-1"),
+        Template(name="data-field-2"),
+        Template(name="data-field-3"),
+        Template(name="data-field-4"),
     ]
 
     incomplete = "template.data"
@@ -138,14 +136,14 @@ def test_find_template():
 
 
 def test_find_nested_template():
-    template = Template(id="template")
-    data_field_1 = Template(id="data-field-1")
-    data_field_1.children = [Template(id="depth-field-1")]
+    template = Template(name="template")
+    data_field_1 = Template(name="data-field-1")
+    data_field_1.children = [Template(name="depth-field-1")]
     template.children = [
         data_field_1,
-        Template(id="data-field-2"),
-        Template(id="data-field-3"),
-        Template(id="data-field-4"),
+        Template(name="data-field-2"),
+        Template(name="data-field-3"),
+        Template(name="data-field-4"),
     ]
 
     incomplete = "template.data-field-1.depth"
@@ -156,14 +154,14 @@ def test_find_nested_template():
 
 
 def test_find_nothing():
-    template = Template(id="template")
-    data_field_1 = Template(id="data-field-1")
-    data_field_1.children = [Template(id="depth-field-1")]
+    template = Template(name="template")
+    data_field_1 = Template(name="data-field-1")
+    data_field_1.children = [Template(name="depth-field-1")]
     template.children = [
         data_field_1,
-        Template(id="data-field-2"),
-        Template(id="data-field-3"),
-        Template(id="data-field-4"),
+        Template(name="data-field-2"),
+        Template(name="data-field-3"),
+        Template(name="data-field-4"),
     ]
 
     incomplete = "template.data-field-1.abcd"
