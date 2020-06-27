@@ -7,7 +7,7 @@ from binalyzer import (
     Template,
     ResolvableValue,
     XMLTemplateParser,
-    SimpleTemplateProvider,
+    TemplateProvider,
     BufferedIODataProvider,
     __version__,
 )
@@ -44,7 +44,7 @@ def dump(file, start_offset, end_offset, output):
     template = Template()
     template.offset = ResolvableValue(start_offset)
     template.size = ResolvableValue(size)
-    template_provider = SimpleTemplateProvider(template)
+    template_provider = TemplateProvider(template)
     data_provider = BufferedIODataProvider(file)
     binalyzer = Binalyzer(template_provider, data_provider)
     binalyzer.template = template
@@ -67,7 +67,7 @@ def dump(file, start_offset, end_offset, output):
 def template(file, template_file, template_path, output):
     """Dump file content using a template.
     """
-    template_provider = SimpleTemplateProvider(template_path.root)
+    template_provider = TemplateProvider(template_path.root)
     data_provider = BufferedIODataProvider(file)
     binalyzer = Binalyzer(template_provider, data_provider)
     binalyzer.template = template_path.root
@@ -151,8 +151,8 @@ def to_json(template):
 @click.argument("file", type=ExpandedFile("rb"))
 @click.argument("template_file", type=ExpandedFile("r"), required=False)
 def json(file, template_file):
-    template = Template(id="root")
-    template_provider = SimpleTemplateProvider(template)
+    template = Template(name="root")
+    template_provider = TemplateProvider(template)
     data_provider = BufferedIODataProvider(file)
     binalyzer = Binalyzer(template_provider, data_provider)
     binalyzer.template = template
