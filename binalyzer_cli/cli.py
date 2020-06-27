@@ -10,7 +10,7 @@ from anytree.search import findall
 from binalyzer import (
     Binalyzer,
     Template,
-    SimpleTemplateProvider,
+    TemplateProvider,
     ResolvableValue,
     XMLTemplateParser,
     __version__,
