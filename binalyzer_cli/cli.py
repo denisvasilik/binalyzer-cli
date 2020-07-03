@@ -11,7 +11,7 @@ from binalyzer import (
     Binalyzer,
     Template,
     TemplateProvider,
-    ResolvableValue,
+    ValueProperty,
     XMLTemplateParser,
     __version__,
     BufferedIODataProvider,

@@ -5,7 +5,7 @@ import hexdump
 from binalyzer import (
     Binalyzer,
     Template,
-    ResolvableValue,
+    ValueProperty,
     XMLTemplateParser,
     TemplateProvider,
     BufferedIODataProvider,
@@ -42,8 +42,8 @@ def dump(file, start_offset, end_offset, output):
         size = end_offset - start_offset
 
     template = Template()
-    template.offset = ResolvableValue(start_offset)
-    template.size = ResolvableValue(size)
+    template.offset = ValueProperty(start_offset)
+    template.size = ValueProperty(size)
     template_provider = TemplateProvider(template)
     data_provider = BufferedIODataProvider(file)
     binalyzer = Binalyzer(template_provider, data_provider)
