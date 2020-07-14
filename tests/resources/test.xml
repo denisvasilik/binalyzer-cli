@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <template name="binary-data-64">
     <field name="data-field-1" size="32">
         <field name="depth-field-123" size="32"></field>
