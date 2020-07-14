@@ -1,3 +1,14 @@
+"""
+    binalyzer_cli.commands
+    ~~~~~~~~~~~~~~~~~~~~~~
+
+    This module implements commands provided by Binalyzer's command line
+    interface.
+
+    :copyright: 2020 Denis Vasilík
+    :license: MIT, see LICENSE for details.
+"""
+
 import os
 import click
 import hexdump
@@ -21,6 +32,7 @@ from .cli import (
 
 BASED_INT = BasedIntParamType()
 
+
 @click.command()
 @click.argument("file", type=ExpandedFile("rb"))
 @click.option("--start-offset", default="0", type=BASED_INT)
@@ -33,7 +45,8 @@ def dump(file, start_offset, end_offset, output):
     size = file.tell()
 
     if end_offset and end_offset < start_offset:
-        raise RuntimeError("The given end offset is smaller than the start offset.")
+        raise RuntimeError(
+            "The given end offset is smaller than the start offset.")
 
     if end_offset and end_offset > (start_offset + size):
         end_offset = start_offset + size
@@ -116,7 +129,8 @@ def to_json(template):
     maxLineCharacter = 16
     startLine = int(template.offset.value / maxLineCharacter)
     startCharacter = int(template.offset.value % maxLineCharacter) * 3
-    endLine = int((template.offset.value + template.size.value) / maxLineCharacter)
+    endLine = int(
+        (template.offset.value + template.size.value) / maxLineCharacter)
     endCharacter = (
         int((template.offset.value + template.size.value) % maxLineCharacter) * 3
     )
@@ -203,7 +217,7 @@ def customized_dumpgen(data, offset):
         dumpstr = hexdump.dump(d)
         line += dumpstr[: 8 * 3]
         if len(d) > 8:  # insert separator if needed
-            line += " " + dumpstr[8 * 3 :]
+            line += " " + dumpstr[8 * 3:]
         # ................
         # calculate indentation, which may be different for the last line
         pad = 2

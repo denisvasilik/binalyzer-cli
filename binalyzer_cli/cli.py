@@ -1,3 +1,13 @@
+"""
+    binalyzer_cli.cli
+    ~~~~~~~~~~~~~~~~~
+
+    This module implements Binalyzer's command line interface.
+
+    :copyright: 2020 Denis Vasilík
+    :license: MIT, see LICENSE for details.
+"""
+
 import os
 import click
 import importlib
