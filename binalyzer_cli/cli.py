@@ -64,7 +64,7 @@ def try_get_version_info(package_name):
     try:
         package = importlib.import_module(package_name)
         if package.__version__:
-            return "{:s} ({:s})".format(package_name, package.__version__[1:])
+            return "{:s} ({:s})".format(package_name, package.__version__)
         else:
             return "{:s} ({:s})".format(package_name, package.__commit__[:7])
     except ImportError:
