@@ -34,6 +34,7 @@ _BINALYZER_PACKAGES = [
     "binalyzer_cli",
     "binalyzer_data_provider",
     "binalyzer_template_provider",
+    "binalyzer_rest",
     "binalyzer_wasm"
 ]
 
