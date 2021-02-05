@@ -55,17 +55,15 @@ def dump(file, start_offset, end_offset, output):
         size = end_offset - start_offset
 
     template = Template()
-    template.offset = ValueProperty(start_offset)
-    template.size = ValueProperty(size)
-    template_provider = TemplateProvider(template)
-    data_provider = BufferedIODataProvider(file)
-    binalyzer = Binalyzer(template_provider, data_provider)
+    template.offset = start_offset
+    template.size = size
+    binalyzer = Binalyzer(template, file)
     binalyzer.template = template
 
     if output:
         output.write(template.value)
     else:
-        hexdump.hexdump(template.value, template.offset.value)
+        hexdump.hexdump(template.value, template.offset)
 
 
 @click.command()
@@ -80,15 +78,13 @@ def dump(file, start_offset, end_offset, output):
 def template(file, template_file, template_path, output):
     """Dump file content using a template.
     """
-    template_provider = TemplateProvider(template_path.root)
-    data_provider = BufferedIODataProvider(file)
-    binalyzer = Binalyzer(template_provider, data_provider)
+    binalyzer = Binalyzer(template_path.root, file)
     binalyzer.template = template_path.root
 
     if output:
         output.write(template_path.value)
     else:
-        hexdump.hexdump(template_path.value, template_path.offset.value)
+        hexdump.hexdump(template_path.value, template_path.offset)
 
     return 0
 
@@ -127,12 +123,12 @@ def visitTemplates(templates, fn, value):
 
 def to_json(template):
     maxLineCharacter = 16
-    startLine = int(template.offset.value / maxLineCharacter)
-    startCharacter = int(template.offset.value % maxLineCharacter) * 3
+    startLine = int(template.offset / maxLineCharacter)
+    startCharacter = int(template.offset % maxLineCharacter) * 3
     endLine = int(
-        (template.offset.value + template.size.value) / maxLineCharacter)
+        (template.offset + template.size) / maxLineCharacter)
     endCharacter = (
-        int((template.offset.value + template.size.value) % maxLineCharacter) * 3
+        int((template.offset + template.size) % maxLineCharacter) * 3
     )
 
     content = ""
@@ -144,9 +140,9 @@ def to_json(template):
         '"id": "'
         + template.name
         + '", "offset": '
-        + str(template.offset.value)
+        + str(template.offset)
         + ', "size": '
-        + str(template.size.value)
+        + str(template.size)
         + ', "start": { "line": '
         + str(startLine)
         + ', "character": '
@@ -166,9 +162,7 @@ def to_json(template):
 @click.argument("template_file", type=ExpandedFile("r"), required=False)
 def json(file, template_file):
     template = Template(name="root")
-    template_provider = TemplateProvider(template)
-    data_provider = BufferedIODataProvider(file)
-    binalyzer = Binalyzer(template_provider, data_provider)
+    binalyzer = Binalyzer(template, file)
     binalyzer.template = template
 
     if template_file:
