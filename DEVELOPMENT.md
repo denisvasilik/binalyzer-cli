@@ -62,6 +62,13 @@ The following command runs the hooks and checks all files.
 Continuous testing is provided by [Travis] (for unit tests and style checks
 on Linux).
 
+## Local Test
+
+```console
+~$ source ../.venv/bin/activate
+~$ make test
+```
+
 [Travis]: https://travis-ci.org/denisvasilik/binalyzer
 [repo]:https://gerrit.googlesource.com/git-repo/+/refs/heads/master/README.md
 [binalyzer]: https://github.com/denisvasilik/binalyzer
