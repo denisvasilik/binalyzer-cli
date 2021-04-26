@@ -24,7 +24,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3.6",
-        "Operating System :: OS Independent",
+        "Operating System :: POSIX :: Linux",
     ],
     dependency_links=[],
     package_dir={"binalyzer_cli": "binalyzer_cli"},
@@ -32,7 +32,6 @@ setuptools.setup(
     data_files=[("", ["CHANGELOG.md"])],
     setup_requires=[],
     install_requires=[
-        "binalyzer",
         "hexdump",
         "click",
     ],
