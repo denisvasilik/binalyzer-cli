@@ -5,7 +5,7 @@
     This module implements commands provided by Binalyzer's command line
     interface.
 
-    :copyright: 2020 Denis Vasilík
+    :copyright: 2021 Denis Vasilík
     :license: MIT, see LICENSE for details.
 """
 
@@ -97,79 +97,6 @@ def dump_all(template):
     for x in ["{0:02X}".format(x) for x in data]:
         content += f'"{x}", '
     return content[:-2]
-
-
-def visitTemplate(template, fn):
-    value = '{ "data": ['
-    value += dump_all(template)
-    value += '], "template": { '
-    value += fn(template)
-    value = visitTemplates(template.children, fn, value)
-    return value + "} }"
-
-
-def visitTemplates(templates, fn, value):
-    if not len(templates):
-        return value
-    value += ', "children": [{'
-    for child in templates:
-        value += fn(child)
-        value = visitTemplates(child.children, fn, value)
-        value += " }, {"
-    value = value[:-3]
-    value += "] "
-    return value
-
-
-def to_json(template):
-    maxLineCharacter = 16
-    startLine = int(template.offset / maxLineCharacter)
-    startCharacter = int(template.offset % maxLineCharacter) * 3
-    endLine = int(
-        (template.offset + template.size) / maxLineCharacter)
-    endCharacter = (
-        int((template.offset + template.size) % maxLineCharacter) * 3
-    )
-
-    content = ""
-    for x in ["{0:02X}".format(x) for x in template.value]:
-        content += f'"{x}", '
-    content = content[:-2]
-
-    return (
-        '"id": "'
-        + template.name
-        + '", "offset": '
-        + str(template.offset)
-        + ', "size": '
-        + str(template.size)
-        + ', "start": { "line": '
-        + str(startLine)
-        + ', "character": '
-        + str(startCharacter)
-        + ' }, "end": { "line": '
-        + str(endLine)
-        + ', "character": '
-        + str(endCharacter)
-        + ' }, "data": ['
-        + content
-        + "]"
-    )
-
-
-@click.command()
-@click.argument("file", type=ExpandedFile("rb"))
-@click.argument("template_file", type=ExpandedFile("r"), required=False)
-def json(file, template_file):
-    template = Template(name="root")
-    binalyzer = Binalyzer(template, file)
-    binalyzer.template = template
-
-    if template_file:
-        template = XMLTemplateParser(template_file.read()).parse()
-        binalyzer.template = template.root
-
-    print(visitTemplate(binalyzer.template, to_json))
 
 
 def customized_hexdump(data, offset, result="print"):

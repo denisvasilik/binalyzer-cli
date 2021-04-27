@@ -4,7 +4,7 @@
 
     This module implements Binalyzer's command line interface.
 
-    :copyright: 2020 Denis Vasilík
+    :copyright: 2021 Denis Vasilík
     :license: MIT, see LICENSE for details.
 """
 
